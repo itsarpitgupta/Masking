@@ -1,24 +1,26 @@
 import java.util.regex.Pattern;
 
 public class EmailValidator {
-    // Regular expression to validate username
-    private static final String USERNAME_REGEX = "^[a-zA-Z0-9][a-zA-Z0-9!#$%&'*+\\-/=?^_`{|}]*[a-zA-Z0-9]$";
+    // Username regex: alphanumeric, special characters allowed, no consecutive special characters, no leading special characters
+    private static final String USERNAME_REGEX = "^[a-zA-Z0-9]([a-zA-Z0-9!#$%&'*+/=?^_`{|}]*[a-zA-Z0-9])?$";
     
-    // Regular expression to validate domain
-    private static final String DOMAIN_REGEX = "^[a-zA-Z0-9](?!.*[-.]{2})[a-zA-Z0-9-.]{0,62}[a-zA-Z0-9]$";
+    // Domain regex: alphanumeric, period and hyphen allowed, no consecutive periods/hyphens, no leading/trailing periods/hyphens
+    private static final String DOMAIN_REGEX = "^[a-zA-Z0-9]([a-zA-Z0-9-.]*[a-zA-Z0-9])?$";
 
-    // Regular expression to validate entire email
-    private static final String EMAIL_REGEX = "^([a-zA-Z0-9][a-zA-Z0-9!#$%&'*+\\-/=?^_`{|}]{0,63})@([a-zA-Z0-9](?!.*[-.]{2})[a-zA-Z0-9-.]{0,62}[a-zA-Z0-9])$";
+    // Full email regex combining username and domain, with only one '@' symbol allowed
+    private static final String EMAIL_REGEX = "^" + USERNAME_REGEX + "@" + DOMAIN_REGEX + "$";
 
-    // Custom error messages
+    // Custom error message for restricted words
     private static final String ERROR_SPECIAL_STRING = "We are unable to accept an email address containing 'FXCM'/'fuhui'. Please provide a different email address.";
 
-    // Function to validate email address
+    // Function to validate the email address based on requirements
     public static String validateEmail(String email) {
-        if (email.contains("fuhui") || email.contains("FXCM")) {
+        // Check for forbidden substrings "fuhui" or "FXCM"
+        if (email.toLowerCase().contains("fuhui") || email.toUpperCase().contains("FXCM")) {
             return ERROR_SPECIAL_STRING;
         }
 
+        // Validate the email structure using the regular expression
         if (Pattern.matches(EMAIL_REGEX, email)) {
             return "Valid email";
         } else {
@@ -29,13 +31,17 @@ public class EmailValidator {
     public static void main(String[] args) {
         // Test cases
         String[] emails = {
-            "valid.email@example.com",
-            "invalid..email@example.com",
-            "user@domain..com",
-            "invalid@fuhui.com",
-            "user@domain-.com",
-            "user@domain.com",
-            "FXCM_user@domain.com"
+            "valid.email@example.com",           // valid email
+            "invalid..email@example.com",        // invalid: consecutive periods
+            "user@domain..com",                  // invalid: consecutive periods in domain
+            "invalid@fuhui.com",                 // invalid: contains "fuhui"
+            "user@domain-.com",                  // invalid: domain ends with hyphen
+            "user@domain.com",                   // valid email
+            "FXCM_user@domain.com",              // invalid: contains "FXCM"
+            "user_name+tag@example.com",         // valid email with special characters
+            "user--name@example.com",            // invalid: consecutive special characters in username
+            "user@sub-domain.com",               // valid email with hyphen and period in domain
+            "user@domain..com"                   // invalid: consecutive period in domain
         };
 
         for (String email : emails) {
