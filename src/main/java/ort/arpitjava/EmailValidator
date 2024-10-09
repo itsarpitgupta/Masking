@@ -1,0 +1,45 @@
+import java.util.regex.Pattern;
+
+public class EmailValidator {
+    // Regular expression to validate username
+    private static final String USERNAME_REGEX = "^[a-zA-Z0-9][a-zA-Z0-9!#$%&'*+\\-/=?^_`{|}]*[a-zA-Z0-9]$";
+    
+    // Regular expression to validate domain
+    private static final String DOMAIN_REGEX = "^[a-zA-Z0-9](?!.*[-.]{2})[a-zA-Z0-9-.]{0,62}[a-zA-Z0-9]$";
+
+    // Regular expression to validate entire email
+    private static final String EMAIL_REGEX = "^([a-zA-Z0-9][a-zA-Z0-9!#$%&'*+\\-/=?^_`{|}]{0,63})@([a-zA-Z0-9](?!.*[-.]{2})[a-zA-Z0-9-.]{0,62}[a-zA-Z0-9])$";
+
+    // Custom error messages
+    private static final String ERROR_SPECIAL_STRING = "We are unable to accept an email address containing 'FXCM'/'fuhui'. Please provide a different email address.";
+
+    // Function to validate email address
+    public static String validateEmail(String email) {
+        if (email.contains("fuhui") || email.contains("FXCM")) {
+            return ERROR_SPECIAL_STRING;
+        }
+
+        if (Pattern.matches(EMAIL_REGEX, email)) {
+            return "Valid email";
+        } else {
+            return "Invalid email";
+        }
+    }
+
+    public static void main(String[] args) {
+        // Test cases
+        String[] emails = {
+            "valid.email@example.com",
+            "invalid..email@example.com",
+            "user@domain..com",
+            "invalid@fuhui.com",
+            "user@domain-.com",
+            "user@domain.com",
+            "FXCM_user@domain.com"
+        };
+
+        for (String email : emails) {
+            System.out.println("Email: " + email + " -> " + validateEmail(email));
+        }
+    }
+}
