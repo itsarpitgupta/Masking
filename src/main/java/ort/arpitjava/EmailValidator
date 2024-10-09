@@ -1,11 +1,12 @@
 import java.util.regex.Pattern;
 
 public class EmailValidator {
-    // Username regex: allows alphanumeric, dots, and special characters, but no leading/trailing dots or consecutive special characters
-    private static final String USERNAME_REGEX = "^[a-zA-Z0-9]([a-zA-Z0-9.!#$%&'*+/=?^_`{|}-]*[a-zA-Z0-9])?$";
+
+    // Username regex: allows alphanumeric and special characters, but no leading/trailing dots, no consecutive periods or special characters
+    private static final String USERNAME_REGEX = "^[a-zA-Z0-9]+([.!#$%&'*+/=?^_`{|}-][a-zA-Z0-9]+)*$";
     
-    // Domain regex: alphanumeric, period and hyphen allowed, no consecutive periods/hyphens, no leading/trailing periods/hyphens
-    private static final String DOMAIN_REGEX = "^[a-zA-Z0-9]([a-zA-Z0-9-]*\\.?[a-zA-Z0-9-]+)*\\.[a-zA-Z]{2,}$";
+    // Domain regex: allows alphanumeric, period and hyphen, no consecutive periods/hyphens, no leading/trailing periods/hyphens
+    private static final String DOMAIN_REGEX = "^[a-zA-Z0-9]+([-a-zA-Z0-9]*[a-zA-Z0-9])*(\\.[a-zA-Z]{2,})$";
 
     // Custom error message for restricted words
     private static final String ERROR_SPECIAL_STRING = "We are unable to accept an email address containing 'FXCM'/'fuhui'. Please provide a different email address.";
@@ -43,7 +44,7 @@ public class EmailValidator {
         // Test cases
         String[] emails = {
             "valid.email@example.com",           // valid email
-            "invalid..email@example.com",        // invalid: consecutive periods
+            "invalid..email@example.com",        // invalid: consecutive periods in username
             "user@domain..com",                  // invalid: consecutive periods in domain
             "invalid@fuhui.com",                 // invalid: contains "fuhui"
             "user@domain-.com",                  // invalid: domain ends with hyphen
