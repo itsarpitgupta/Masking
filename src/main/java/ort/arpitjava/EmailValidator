@@ -1,14 +1,11 @@
 import java.util.regex.Pattern;
 
 public class EmailValidator {
-    // Username regex: alphanumeric, special characters allowed, no consecutive special characters, no leading special characters
-    private static final String USERNAME_REGEX = "^[a-zA-Z0-9]([a-zA-Z0-9!#$%&'*+/=?^_`{|}]*[a-zA-Z0-9])?$";
+    // Username regex: allows alphanumeric, dots, and special characters, but no leading/trailing dots or consecutive special characters
+    private static final String USERNAME_REGEX = "^[a-zA-Z0-9]([a-zA-Z0-9.!#$%&'*+/=?^_`{|}-]*[a-zA-Z0-9])?$";
     
     // Domain regex: alphanumeric, period and hyphen allowed, no consecutive periods/hyphens, no leading/trailing periods/hyphens
-    private static final String DOMAIN_REGEX = "^[a-zA-Z0-9]([a-zA-Z0-9-.]*[a-zA-Z0-9])?$";
-
-    // Full email regex combining username and domain, with only one '@' symbol allowed
-    private static final String EMAIL_REGEX = "^" + USERNAME_REGEX + "@" + DOMAIN_REGEX + "$";
+    private static final String DOMAIN_REGEX = "^[a-zA-Z0-9]([a-zA-Z0-9-]*\\.?[a-zA-Z0-9-]+)*\\.[a-zA-Z]{2,}$";
 
     // Custom error message for restricted words
     private static final String ERROR_SPECIAL_STRING = "We are unable to accept an email address containing 'FXCM'/'fuhui'. Please provide a different email address.";
@@ -20,12 +17,26 @@ public class EmailValidator {
             return ERROR_SPECIAL_STRING;
         }
 
-        // Validate the email structure using the regular expression
-        if (Pattern.matches(EMAIL_REGEX, email)) {
-            return "Valid email";
-        } else {
-            return "Invalid email";
+        // Split email into local part (username) and domain part
+        String[] parts = email.split("@");
+        if (parts.length != 2) {
+            return "Invalid email: must contain exactly one '@'";
         }
+
+        String username = parts[0];
+        String domain = parts[1];
+
+        // Validate username and domain separately
+        if (!Pattern.matches(USERNAME_REGEX, username)) {
+            return "Invalid email: username doesn't meet requirements";
+        }
+
+        if (!Pattern.matches(DOMAIN_REGEX, domain)) {
+            return "Invalid email: domain doesn't meet requirements";
+        }
+
+        // If both username and domain are valid
+        return "Valid email";
     }
 
     public static void main(String[] args) {
